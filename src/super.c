@@ -10,12 +10,10 @@
 
 // We'll use gcc major version as a proxy for the glibc library to decide which feature macro to use.
 // gcc 5.1 was released 2015-04-22...
-#ifndef __GNUC__
-#  define _DEFAULT_SOURCE         ///< strcasecmp() feature macro starting glibc 2.20 (2014-09-08)
-#elif __GNUC__ >= 5 || __clang__
-#  define _DEFAULT_SOURCE         ///< strcasecmp() feature macro starting glibc 2.20 (2014-09-08)
-#else
+#if defined(__GNUC__) && (__GNUC__ < 5)
 #  define _BSD_SOURCE             ///< strcasecmp() feature macro for glibc <= 2.19
+#else
+#  define _DEFAULT_SOURCE         ///< strcasecmp() feature macro starting glibc 2.20 (2014-09-08)
 #endif
 
 #include <math.h>
@@ -25,6 +23,12 @@
 /// \cond PRIVATE
 #define __NOVAS_INTERNAL_API__    ///< Use definitions meant for internal use by SuperNOVAS only
 #include "novas.h"
+
+#if __Lynx__ && __powerpc__
+// strcasecmp() is not defined on PowerPC / LynxOS 3.1
+int strcasecmp(const char *s1, const char *s2);
+#endif
+
 /// \endcond
 
 /**
@@ -403,6 +407,16 @@ int cirs_to_tod(double jd_tt, enum novas_accuracy accuracy, const double *in, do
 /**
  * Transforms a rectangular equatorial (x, y, z) vector from the True of Date (TOD) reference
  * system to the Celestial Intermediate Reference System (CIRS) at the given epoch to the .
+ *
+ * NOTES:
+ * <ol>
+ * <li>The accuracy of the output CIRS coordinates depends on how the input TOD coordinates
+ * were obtained. If TOD was calculated via the old (pre IAU 2006) method, using the Lieske et
+ * al. 1997 nutation model, then the limited accuracy of that model will affect the resulting
+ * coordinates. This is the case for the SuperNOVAS functions novas_geom_posvel() and
+ * novas_sky_pos() also, when called with `NOVAS_TOD` as the system, as well as all legacy NOVAS
+ * C functions that produce TOD coordinates.</li>
+ * </ol>
  *
  * @param jd_tt     [day] Terrestrial Time (TT) based Julian date that defines
  *                  the output epoch. Typically it does not require much precision, and

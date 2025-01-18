@@ -12,7 +12,7 @@ $(OBJ)/%.o: $(SRC)/%.c $(OBJ) Makefile
 
 # Share library recipe
 $(LIB)/%.so.$(SO_VERSION):
-	@make $(LIB)
+	@$(MAKE) $(LIB)
 	$(CC) -o $@ $(CPPFLAGS) $(CFLAGS) $^ -shared -fPIC -Wl,-soname,$(subst $(LIB)/,,$@) $(LDFLAGS)
 
 # Unversioned shared libs (for linking against)
@@ -22,13 +22,13 @@ $(LIB)/lib%.so:
 
 # Static library recipe
 $(LIB)/%.a:
-	@make $(LIB)
+	@$(MAKE) $(LIB)
 	ar -rc $@ $^
 	ranlib $@
 
 # Create sub-directories for build targets
 $(OBJ) $(LIB) $(BIN) apidoc:
-	mkdir $@
+	mkdir -p $@
 
 # Remove intermediate files locally
 .PHONY: clean-local
@@ -58,7 +58,7 @@ analyze:
 # Static code analysis viacat Facebook's infer
 .PHONY: infer
 infer: clean
-	infer run -- make shared
+	infer run -- $(MAKE) shared
 
 # Doxygen documentation (HTML and man pages) under apidocs/
 .PHONY: dox

@@ -73,11 +73,11 @@ distro: $(SHARED_TARGETS) $(DOC_TARGETS)
 
 # Shared libraries (versioned and unversioned)
 .PHONY: shared
-shared: $(SHARED_TARGETS)
+shared: check-cio-locator $(SHARED_TARGETS)
 
 # Legacy static libraries (locally built)
 .PHONY: static
-static: $(LIB)/libnovas.a solsys
+static: check-cio-locator $(LIB)/libnovas.a solsys
 
 # solarsystem() call handler objects
 .PHONY: solsys
@@ -90,7 +90,7 @@ all: distro static test coverage analyze
 # Run regression tests
 .PHONY: test
 test:
-	make -C test run
+	$(MAKE) -C test run
 
 # Perform checks (test + analyze)
 .PHONY: check
@@ -99,18 +99,25 @@ check: test analyze
 # Measure test coverage (on test set of files only)
 .PHONY: coverage
 coverage:
-	make -C test coverage
+	$(MAKE) -C test coverage
 
 # Remove intermediates
 .PHONY: clean
 clean:
 	rm -f $(OBJECTS) README-orig.md $(BIN)/cio_file gmon.out
-	make -C test clean
+	$(MAKE) -C test clean
 
 # Remove all generated files
 .PHONY: distclean
 distclean: clean
-	rm -f $(LIB)/libsupernovas.so* $(LIB)/libnovas.so* $(LIB)/libnovas.a $(LIB)/libsolsys*.so* cio_ra.bin
+	rm -f $(LIB)/libsupernovas.so* $(LIB)/libsupernovas.a $(LIB)/libnovas.so* $(LIB)/libnovas.a $(LIB)/libsolsys*.so* cio_ra.bin
+
+.PHONY:
+check-cio-locator:
+ifndef CIO_LOCATOR_FILE
+	  $(info WARNING! No default CIO_LOCATOR_FILE defined. Will use local 'cio_ra.bin' if present.)
+endif
+
 
 # ----------------------------------------------------------------------------
 # The nitty-gritty stuff below
@@ -161,9 +168,12 @@ $(LIB)/libsolsys-calceph.so.$(SO_VERSION): $(SRC)/solsys-calceph.c | $(LIB)/libs
 $(LIB)/libsolsys-cspice.so.$(SO_VERSION): LDFLAGS += -lcspice
 $(LIB)/libsolsys-cspice.so.$(SO_VERSION): $(SRC)/solsys-cspice.c | $(LIB)/libsupernovas.so
 
+# Static library: libsupernovas.a
+$(LIB)/libsupernovas.a: $(OBJECTS) | $(LIB) Makefile
 
-# Static library: libnovas.a
-$(LIB)/libnovas.a: $(OBJECTS) | $(LIB) Makefile
+$(LIB)/libnovas.a: $(LIB)/libsupernovas.a
+	@rm -f $@
+	( cd $(LIB); ln -s libsupernovas.a libnovas.a )
 
 # CIO locator data
 cio_ra.bin: data/CIO_RA.TXT $(BIN)/cio_file
@@ -212,7 +222,7 @@ install-libs:
 ifneq ($(wildcard $(LIB)/*),)
 	@echo "installing libraries to $(DESTDIR)$(libdir)"
 	install -d $(DESTDIR)$(libdir)
-	$(INSTALL_PROGRAM) -D $(LIB)/lib*.so* $(DESTDIR)$(libdir)/
+	cp $(LIB)/lib* $(DESTDIR)$(libdir)/
 else
 	@echo "WARNING! Skipping libs install: needs 'shared' and/or 'static'"
 endif
@@ -236,6 +246,9 @@ ifneq ($(wildcard apidoc/html/search/*),)
 	install -d $(DESTDIR)$(htmldir)/search
 	$(INSTALL_DATA) -D apidoc/html/search/* $(DESTDIR)$(htmldir)/search/
 	$(INSTALL_DATA) -D apidoc/html/*.* $(DESTDIR)$(htmldir)/
+	@echo "installing images to $(DESTDIR)$(htmldir)/resources"
+	install -d $(DESTDIR)$(htmldir)/resources
+	$(INSTALL_DATA) -D resources/SuperNOVAS-systems.png $(DESTDIR)$(htmldir)/resources/
 	@echo "installing Doxygen tag file to $(DESTDIR)$(docdir)"
 	install -d $(DESTDIR)$(docdir)
 	$(INSTALL_DATA) apidoc/supernovas.tag $(DESTDIR)$(docdir)/supernovas.tag
@@ -247,7 +260,7 @@ endif
 install-examples:
 	@echo "installing examples to $(DESTDIR)$(docdir)"
 	install -d $(DESTDIR)$(docdir)
-	$(INSTALL_DATA) -D examples/* $(DESTDIR)$(docdir)
+	$(INSTALL_DATA) -D examples/* $(DESTDIR)$(docdir)/
 
 
 # Some standard GNU targets, that should always exist...

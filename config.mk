@@ -74,7 +74,7 @@ endif
 # Compile library with a default readeph() implementation for solsys1.c, which 
 # will be used only if the application does not define another implementation 
 # via calls to the to set_ephem_reader() function.
-DEFAULT_READEPH ?= $(SRC)/readeph0.c
+#DEFAULT_READEPH ?= $(SRC)/readeph0.c
 
 
 # Whether to build into the library planet_jplint() routines provided in 
@@ -143,9 +143,6 @@ endif
 # If the CIO_LOCATOR_FILE variable is defined, the use its definition
 ifdef CIO_LOCATOR_FILE
   CPPFLAGS += -DDEFAULT_CIO_LOCATOR_FILE=\"$(CIO_LOCATOR_FILE)\"
-else
-  $(info WARNING! No default CIO_LOCATOR_FILE defined.)
-  $(info .        Will use local 'cio_ra.bin' if present.)
 endif
 
 # If the THREAD_LOCAL variable was defined externally, use that definition to 
@@ -190,7 +187,7 @@ ifeq ($(BUILTIN_SOLSYS_EPHEM), 1)
   SOURCES += $(SRC)/solsys-ephem.c
 endif
 
-ifdef (DEFAULT_READEPH) 
+ifdef DEFAULT_READEPH
   SOURCES += $(DEFAULT_READEPH)
   CPPFLAGS += -DDEFAULT_READEPH=1
 endif
@@ -228,4 +225,5 @@ OBJECTS := $(subst .c,.o,$(OBJECTS))
 vpath %.h $(INCLUDE)
 vpath %.c $(SRC)
 vpath %.o $(OBJ)
-vpath %.d dep 
+vpath %.d dep
+

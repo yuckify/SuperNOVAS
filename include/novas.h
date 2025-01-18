@@ -40,7 +40,7 @@
 // were declared as 'const' variables, rather than precompiler constants, which meant (a) that they
 // needed to be defined in an actual source code "novascon.c"; a minor inconvenience, and (b)
 // they could not be undefined in case the application needed something else locally with
-// the same name. The rather non unique naming of constants such as 'C', 'F', 'T0', or 'AU' made
+// the same name. The rather non unique naming of constants such as 'C', 'F', 'T0', or 'AU'
 // exacerbated the chance of namespace conflicts when compiled or linked against the user's
 // application code, which may have defined their own constants or variables by the same name.
 //
@@ -65,9 +65,9 @@
 #define SUPERNOVAS_MINOR_VERSION  2
 
 /// Integer sub version of the release
-#define SUPERNOVAS_PATCHLEVEL     0
+#define SUPERNOVAS_PATCHLEVEL     1
 
-/// Additional release information in version, e.g. "-1", or "-rc1".
+/// Additional release information in version, e.g. "-1", or "-rc1", or empty string "" for releases.
 #define SUPERNOVAS_RELEASE_STRING "-devel"
 
 /// \cond PRIVATE
@@ -302,7 +302,7 @@ enum novas_planet {
  */
 #define NOVAS_PLANET_NAMES_INIT { \
   "SSB", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto", \
-  "Sun", "Moon", "EMB", "Pluto-Barycenter" };
+  "Sun", "Moon", "EMB", "Pluto-Barycenter" }
 
 /**
  * Reciprocal masses of solar system bodies, from DE-405 (Sun mass / body mass).
@@ -612,11 +612,12 @@ enum novas_cio_location_type {
  * @sa WOBBLE_ITRS_TO_TIRS
  */
 enum novas_wobble_direction {
-  /// use for wobble() to change from ITRS (actual rotating Earth) to Pseudo Earth Fixed (PEF).
+  /// use for wobble() to change from ITRS (actual rotating Earth) to Pseudo Earth Fixed (PEF) /
+  /// TIRS.
   WOBBLE_ITRS_TO_PEF = 0,
 
-  /// use for wobble() to change from Pseudo Earth Fixed (PEF) to ITRS (actual rotating Earth).
-  /// (You can use any non-zero value as well.)
+  /// use for wobble() to change from Pseudo Earth Fixed (PEF) / TIRS to ITRS (actual rotating
+  /// Earth).
   WOBBLE_PEF_TO_ITRS
 };
 
@@ -834,98 +835,98 @@ typedef struct {
  * @since 1.2
  * @sa object
  */
-#define NOVAS_SSB_INIT NOVAS_PLANET_INIT(NOVAS_SSB, "SSB");
+#define NOVAS_SSB_INIT NOVAS_PLANET_INIT(NOVAS_SSB, "SSB")
 
 /**
  * `object` initializer for the planet Venus
  * @since 1.2
  * @sa object
  */
-#define NOVAS_MERCURY_INIT NOVAS_PLANET_INIT(NOVAS_MERCURY, "Mercury");
+#define NOVAS_MERCURY_INIT NOVAS_PLANET_INIT(NOVAS_MERCURY, "Mercury")
 
 /**
  * `object` initializer for the planet Mercury
  * @since 1.2
  * @sa object
  */
-#define NOVAS_VENUS_INIT NOVAS_PLANET_INIT(NOVAS_VENUS, "Venus");
+#define NOVAS_VENUS_INIT NOVAS_PLANET_INIT(NOVAS_VENUS, "Venus")
 
 /**
  * `object` initializer for the planet Earth
  * @since 1.2
  * @sa object
  */
-#define NOVAS_EARTH_INIT NOVAS_PLANET_INIT(NOVAS_EARTH, "Earth");
+#define NOVAS_EARTH_INIT NOVAS_PLANET_INIT(NOVAS_EARTH, "Earth")
 
 /**
  * `object` initializer for the planet Mars
  * @since 1.2
  * @sa object
  */
-#define NOVAS_MARS_INIT NOVAS_PLANET_INIT(NOVAS_MERCURY, "Mars");
+#define NOVAS_MARS_INIT NOVAS_PLANET_INIT(NOVAS_MERCURY, "Mars")
 
 /**
  * `object` initializer for the planet Jupiter
  * @since 1.2
  * @sa object
  */
-#define NOVAS_JUPITER_INIT NOVAS_PLANET_INIT(NOVAS_JUPITER, "Jupiter");
+#define NOVAS_JUPITER_INIT NOVAS_PLANET_INIT(NOVAS_JUPITER, "Jupiter")
 
 /**
  * `object` initializer for the planet Saturn
  * @since 1.2
  * @sa object
  */
-#define NOVAS_SATURN_INIT NOVAS_PLANET_INIT(NOVAS_SATURN, "Saturn");
+#define NOVAS_SATURN_INIT NOVAS_PLANET_INIT(NOVAS_SATURN, "Saturn")
 
 /**
  * `object` initializer for the planet Uranus
  * @since 1.2
  * @sa object
  */
-#define NOVAS_URANUS_INIT NOVAS_PLANET_INIT(NOVAS_URANUS, "Uranus");
+#define NOVAS_URANUS_INIT NOVAS_PLANET_INIT(NOVAS_URANUS, "Uranus")
 
 /**
  * `object` initializer for the planet Neptune
  * @since 1.2
  * @sa object
  */
-#define NOVAS_NEPTUNE_INIT NOVAS_PLANET_INIT(NOVAS_NEPTUNE, "Neptune");
+#define NOVAS_NEPTUNE_INIT NOVAS_PLANET_INIT(NOVAS_NEPTUNE, "Neptune")
 
 /**
  * `object` initializer for the minor planet Pluto
  * @since 1.2
  * @sa object
  */
-#define NOVAS_PLUTO_INIT NOVAS_PLANET_INIT(NOVAS_PLUTO, "Pluto");
+#define NOVAS_PLUTO_INIT NOVAS_PLANET_INIT(NOVAS_PLUTO, "Pluto")
 
 /**
  * `object` initializer for the Sun
  * @since 1.2
  * @sa object
  */
-#define NOVAS_SUN_INIT NOVAS_PLANET_INIT(NOVAS_SUN, "Sun");
+#define NOVAS_SUN_INIT NOVAS_PLANET_INIT(NOVAS_SUN, "Sun")
 
 /**
  * `object` initializer for the Moon
  * @since 1.2
  * @sa object
  */
-#define NOVAS_MOON_INIT NOVAS_PLANET_INIT(NOVAS_MOON, "Moon");
+#define NOVAS_MOON_INIT NOVAS_PLANET_INIT(NOVAS_MOON, "Moon")
 
 /**
  * `object` initializer for the the Earth-Moon Barycenter (EMB)
  * @since 1.2
  * @sa object
  */
-#define NOVAS_EMB_INIT NOVAS_PLANET_INIT(NOVAS_EMB, "EMB");
+#define NOVAS_EMB_INIT NOVAS_PLANET_INIT(NOVAS_EMB, "EMB")
 
 /**
  * `object` initializer for the Pluto system barycenter
  * @since 1.2
  * @sa object
  */
-#define NOVAS_PLUTO_BARYCENTER_INIT NOVAS_PLANET_INIT(NOVAS_PLUTO_BARYCENTER, "Pluto-Barycenter");
+#define NOVAS_PLUTO_BARYCENTER_INIT NOVAS_PLANET_INIT(NOVAS_PLUTO_BARYCENTER, "Pluto-Barycenter")
 
 /**
  * Data for an observer's location on the surface of the Earth, and optional local weather data for
@@ -1665,36 +1666,39 @@ int mod_to_gcrs(double jd_tdb, const double *in, double *out);
 #  include <stdio.h>
 #  include <math.h>
 
-#define _CONSTS_
+#ifndef _CONSTS_
+#  define _CONSTS_
 
-#define HALF_PI             (0.5 * M_PI)
-#define ERAD_AU             (ERAD/AU)
+#  define HALF_PI             (0.5 * M_PI)
+#  define ERAD_AU             (ERAD/AU)
 
-#define XYZ_VECTOR_SIZE     (3 * sizeof(double))
+#  define XYZ_VECTOR_SIZE     (3 * sizeof(double))
 
 // Use shorthand definitions for our constants
-#define JD_J2000            NOVAS_JD_J2000
-#define C                   NOVAS_C
-#define AU_SEC              NOVAS_AU_SEC
-#define C_AUDAY             NOVAS_C_AU_PER_DAY
-#define AU                  NOVAS_AU
-#define AU_KM               NOVAS_AU_KM
-#define GS                  NOVAS_G_SUN
-#define GE                  NOVAS_G_EARTH
-#define ERAD                NOVAS_EARTH_RADIUS
-#define EF                  NOVAS_EARTH_FLATTENING
-#define ANGVEL              NOVAS_EARTH_ANGVEL
+#  define JD_J2000            NOVAS_JD_J2000
+#  define C                   NOVAS_C
+#  define AU_SEC              NOVAS_AU_SEC
+#  define C_AUDAY             NOVAS_C_AU_PER_DAY
+#  define AU                  NOVAS_AU
+#  define AU_KM               NOVAS_AU_KM
+#  define GS                  NOVAS_G_SUN
+#  define GE                  NOVAS_G_EARTH
+#  define ERAD                NOVAS_EARTH_RADIUS
+#  define EF                  NOVAS_EARTH_FLATTENING
+#  define ANGVEL              NOVAS_EARTH_ANGVEL
 
 // Various locally used physical units
-#define DAY                 NOVAS_DAY
-#define DAY_HOURS           24.0
-#define DEG360              360.0
-#define JULIAN_YEAR_DAYS    365.25
-#define JULIAN_CENTURY_DAYS 36525.0
-#define ARCSEC              NOVAS_ARCSEC
-#define DEGREE              NOVAS_DEGREE
-#define HOURANGLE           NOVAS_HOURANGLE
-#define MAS                 (1e-3 * ASEC2RAD)
+#  define DAY                 NOVAS_DAY
+#  define DAY_HOURS           24.0
+#  define DEG360              360.0
+#  define JULIAN_YEAR_DAYS    365.25
+#  define JULIAN_CENTURY_DAYS 36525.0
+#  define ARCSEC              NOVAS_ARCSEC
+#  define DEGREE              NOVAS_DEGREE
+#  define HOURANGLE           NOVAS_HOURANGLE
+#  define MAS                 (1e-3 * ASEC2RAD)
+
+#endif /* _CONSTS_ */
 
 // On some older platform NAN may not be defined, so define it here if need be
 #ifndef NAN

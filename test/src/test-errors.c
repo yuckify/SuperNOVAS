@@ -1,6 +1,4 @@
 /**
- * @file
- *
  * @date Created  on Feb 19, 2024
  * @author Attila Kovacs
  */
@@ -279,8 +277,10 @@ static int test_ephemeris() {
   if(check("ephemeris:pos+vel", -1, ephemeris(tdb, &ceres, NOVAS_BARYCENTER, NOVAS_FULL_ACCURACY, NULL, NULL))) n++;
   if(check("ephemeris:pos=vel", -1, ephemeris(tdb, &ceres, NOVAS_BARYCENTER, NOVAS_FULL_ACCURACY, p, p))) n++;
   if(check("ephemeris:origin", 1, ephemeris(tdb, &ceres, -1, NOVAS_FULL_ACCURACY, p, v))) n++;
-  if(check("ephemeris:noephem", -1, ephemeris(tdb, &ceres, NOVAS_BARYCENTER, NOVAS_FULL_ACCURACY, p, v))) n++;
 
+#ifndef DEFAULT_READEPH
+  if(check("ephemeris:noephem", -1, ephemeris(tdb, &ceres, NOVAS_BARYCENTER, NOVAS_FULL_ACCURACY, p, v))) n++;
+#endif
 
   return n;
 }
@@ -1118,6 +1118,10 @@ static int test_time() {
 
 static double switching_refraction(double jd_tt, const on_surface *loc, enum novas_refraction_type type, double el) {
   static int count;
+  (void) jd_tt;
+  (void) loc;
+  (void) type;
+  (void) el;
   return (count++) % 2 ? -0.1 : 0.1;
 }
 
@@ -1197,7 +1201,7 @@ static int test_change_observer() {
   if(check("change_observer:obs", -1, novas_change_observer(&frame, NULL, &out))) n++;
   if(check("change_observer:out", -1, novas_change_observer(&frame, &obs, NULL))) n++;
 
-  return 0;
+  return n;
 }
 
 static int test_make_transform() {
@@ -1254,9 +1258,11 @@ static int test_geom_posvel() {
   frame.accuracy = 2;
   if(check("geom_posvel:frame:accuracy:2", -1, novas_geom_posvel(&o, &frame, NOVAS_ICRS, pos, vel))) n++;
 
+#ifndef DEFAULT_READEPH
   frame.accuracy = NOVAS_REDUCED_ACCURACY;
   make_ephem_object("blah", 111111, &o);
   if(check("geom_posvel:ephem_object", -1, novas_geom_posvel(&o, &frame, NOVAS_ICRS, pos, vel))) n++;
+#endif
 
   return n;
 }

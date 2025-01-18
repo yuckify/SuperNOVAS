@@ -7,15 +7,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased]
+## [1.2.0] - 2025-01-15
 
-Release candidate for the next feature release, expected around 1 February 2025.
+Feature release. New easy to use adapter modules for CALCEPH or the NAIF CSPICE Toolkit to provide precise positions 
+for Solar-system sources. Also, added support for Keplerian orbitals, such as the ones published by the IAU Minor 
+Planet Center (MPC) for asteroids, comets, and Near-Earth-Objects (NEOs). And, many more fixes and improvements. 
 
 
 ### Fixed
 
  - Fixes to GCC version checking for macros.
 
+ - Fixed dummy `readeph()` implementation in `readeph0.c`, and the use of `DEFAULT_READEPH` in `config.mk`. `readeph0.c` 
+   is not linked by default, and was not linked in prior releases either.
+
+ - Cure LLVM `clang` compiler warnings, in tests and examples also.
+ 
 
 ### Added
 
@@ -77,6 +84,9 @@ Release candidate for the next feature release, expected around 1 February 2025.
    
  - #98: Added `gcrs_to_tod()` / `tod_to_gcrs()` and `gcrs_to_mod()` / `mod_to_gcrs()` vector conversion functions for
    convenience.
+   
+ - #106: New example files under `examples/` demonstrating the recommended approach for using SuperNOVAS to calculate
+   positions for various types of object.
  
  - Added various `object` initializer macros in `novas.h` for the major planets, Sun, Moon, and barycenters, e.g. 
    `NOVAS_EARTH_INIT` or `NOVAS_SSB_INIT`. These wrap the parametric `NOVAS_PLANET_INIT(num, name)` macro, and can be
@@ -96,6 +106,9 @@ Release candidate for the next feature release, expected around 1 February 2025.
  
  - Added missing error tracing in `nutation()`.
  
+ - Added `README.md` Figure 1, to clarify relation of coordinate systems and (Super)NOVAS function to convert vectors
+   among them.
+ 
    
 ### Changed
 
@@ -106,10 +119,22 @@ Release candidate for the next feature release, expected around 1 February 2025.
  - #97: Updated `NOVAS_PLANETS`, `NOVAS_PLANET_NAMES_INIT`, and `NOVAS_RMASS_INIT` macros to include the added planet 
    constants.
    
+ - #106: The old (legacy) NOVAS C example has been removed. Instead a new set of examples are provided, which are 
+   better suited for SuperNOVAS.
+   
  - `make check` now runs both static analysis by cppcheck (new `analysis` target) and regression tests (`test` 
    target), in closer conformance to GNU Makefile standards.
    
  - Added `-g` to default `CFLAGS` as a matter of GNU best practice.
+ 
+ - Static library is now named `ibsupernovas.a`, which is symlinked to `libnovas.a` for back compatibility.
+ 
+ - `readeph0.c` moved to `examples/`. It's a dummy legacy NOVAS C implementation that is not really needed in 
+   SuperNOVAS.
+ 
+ - Various small tweaks to Makefiles.
+ 
+ - Updated `README.md` and API documentation.
  
    
    

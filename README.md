@@ -17,6 +17,8 @@
 
 # SuperNOVAS 
 
+[![DOI](https://zenodo.org/badge/748170057.svg)](https://doi.org/10.5281/zenodo.14584983)
+
 The NOVAS C astrometry library, made better.
 
  - [API documentation](https://smithsonian.github.io/SuperNOVAS/apidoc/html/files.html).
@@ -49,7 +51,6 @@ This document has been updated for the `v1.2` and later releases.
  - [Runtime debug support](#debug-support)
  - [Release schedule](#release-schedule)
 
-
 -----------------------------------------------------------------------------
 
 <a name="introduction"></a>
@@ -75,7 +76,7 @@ to change existing (functional) code you may have written for NOVAS C.
 SuperNOVAS is currently based on NOVAS C version 3.1. We plan to rebase SuperNOVAS to the latest upstream release of 
 the NOVAS C library, if new releases become available.
  
-SuperNOVAS is maintained by [Attila Kovacs](https://github.com/attipaci) at the Center for Astrophysics \| Harvard 
+SuperNOVAS is maintained by [Attila Kovács](https://github.com/attipaci) at the Center for Astrophysics \| Harvard 
 &amp; Smithsonian, and it is available through the [Smithsonian/SuperNOVAS](https://github.com/Smithsonian/SuperNOVAS) 
 repository on GitHub.
 
@@ -92,7 +93,7 @@ Outside contributions are very welcome. See
  - [Smithsonian/cspice-sharedlib](https://github.com/Smithsonian/cspice-sharedlib) for building CSPICE as a shared
    library for dynamic linking.
  - [IAU Minor Planet Center](https://www.minorplanetcenter.net/iau/mpc.html) provides up-to-date orbital elements
-   for asteroid and comets, including for newly discovered objects.
+   for asteroids, comets, and near-Earth objects (NEOs), including newly discovered objects.
 
 
 -----------------------------------------------------------------------------
@@ -369,6 +370,11 @@ switch between different planet and ephemeris calculator functions at will, duri
  - [Calculating positions for a Solar-system source](#solsys-example)
 
 
+SuperNOVAS __v1.1__ has introduced a new, more intuitive, more elegant, and more efficient approach for calculating
+astrometric positions of celestial objects. The guide below is geared towards this new method. However, the original
+NOVAS C approach remains viable also (albeit often less efficient). You may find an equivalent example usage 
+showcasing the original NOVAS method in [LEGACY.md](LEGACY.html).
+
 <a name="methodologies"></a>
 ### Note on alternative methodologies
 
@@ -391,19 +397,28 @@ terms differently:
  
 See the various enums and constants defined in `novas.h`, as well as the descriptions on the various NOVAS routines
 on how they are appropriate for the old and new methodologies respectively. Figure 1 also shows the relation of the
-various old and new coordinate systems and the (Super)NOVAS functions for converting among them.
+various old and new coordinate systems and the (Super)NOVAS functions for converting position / velocity vectors among 
+them.
 
-In NOVAS, the barycentric BCRS and the geocentric GCRS systems are effectively synonymous to ICRS. The origin for
-positions and for velocities, in any reference system, is determined by the `observer` location.
+In NOVAS, the barycentric BCRS and the geocentric GCRS systems are effectively synonymous to ICRS, since the origin 
+for positions and for velocities, in any reference system, is determined by the `observer` location, while aberration
+and gravitational deflection is included for apparent places only (as seen from the observer location). 
+
+Older catalogs, such as B1950 (FK4) or B1900 are just special cases of MOD (mean-of-date) coordinates for the B1950
+and B1900 epochs, respectively.
+
+TIRS (Terrestrial Intermediate Reference System) and its older equivalent PEF (Pseudo-Earth-Fixed) are not explicitly 
+referenced in SuperNOVAS. But they can be thought of as a special case of ITRS (International Terrestrial Reference 
+System) with zero polar offsets (_dx_, _dy_).
+
+WGS84 has been superseded by ITRS for higher accuracy definitions of Earth-based locations. WGS84 matches ITRS to the 
+10m level globally, but it does not account for continental drifts and crustal motion. In (Super)NOVAS all Earth-fixed 
+coordinates are effectively assumed as ITRS, whether explicitly or implicitly. There is nothing WGS84-specific in the 
+implementation.
 
 | ![SuperNOVAS coordinate systems and conversions](resources/SuperNOVAS-systems.png) |
 |:--:| 
-| __Figure 1.__ *SuperNOVAS Coordinate Systems and Conversions*. Functions indicated in bold face are available in NOVAS C also. All other functions are available in SuperNOVAS only.              |
-
-SuperNOVAS __v1.1__ has introduced a new, more intuitive, more elegant, and more efficient approach for calculating
-astrometric positions of celestial objects. The guide below is geared towards this new method. However, the original
-NOVAS C approach remains viable also (albeit often less efficient). You may find an equivalent example usage 
-showcasing the original NOVAS method in [LEGACY.md](LEGACY.html).
+| __Figure 1.__ *SuperNOVAS Coordinate Systems and Conversions*. Functions indicated in bold face are available in NOVAS C also. All other functions are available in SuperNOVAS only. Dotted arrows indicate possible loss of precision due to the inadequacy of the old precession-nutation (Lieske et al. 1977) model. |
 
 
 <a name="sidereal-example"></a>
@@ -440,10 +455,10 @@ adjustment to convert from J2000 to ICRS coordinates.
 
 (Naturally, you can skip the transformation steps above if you have defined your source in ICRS coordinates from the 
 start.) Once the catalog entry is defined in ICRS, you can proceed wrapping it in a generic source structure (which
-handles both catalog and ephemeris sources).
+handles both catalog and Solar-system sources).
 
 ```c
- object source;   // Common structure for a sidereal or an ephemeris source
+ object source;   // Common structure for a sidereal or an Solar-system source
   
  // Wrap it in a generic source data structure
  make_cat_object(&star, &source);
@@ -1109,7 +1124,8 @@ before that level of accuracy is reached.
    major Solar system bodies).
 
  - [__v1.1.1__] For major planets (and Sun and Moon) `rad_vel()` and `place()` will include gravitational corrections 
-   to radial velocity for light originating at the surface, and observed near Earth or at a large distance away.
+   to radial velocity for light originating at the surface, and observed near Earth or at a large distance away from 
+   the source.
 
 -----------------------------------------------------------------------------
 
