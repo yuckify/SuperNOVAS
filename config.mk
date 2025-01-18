@@ -107,7 +107,7 @@ DEFAULT_SOLSYS ?= 3
 # LD_LIBRARY_PATH, and calceph.h in /usr/include or some other accessible
 # location (you may also  set an appropriate -I<path> option to CPPFLAGS 
 # prior to calling make).
-#CALCEPH_SUPPORT = 1
+CALCEPH_SUPPORT = 1
 
 
 # Whether or not to build solsys-cspice libraries. You need the CSPICE 
